@@ -42,4 +42,5 @@ jobs:
           git config user.email "18982811237@163.com"
           git add .
           git commit -am "Feat: Github Action Auto Update Blog"
+          git branch -m main
           git push --force --quiet "https://${{secrets.BLOG_TOKEN}}@github.com/willow237/blog.git" main:main
