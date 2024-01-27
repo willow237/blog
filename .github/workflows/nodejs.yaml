@@ -1,0 +1,46 @@
+name: Blog Deploy
+
+on: 
+  push:
+    branches: 
+      - dev
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [16.x]
+
+    steps:
+      - name: 1. git checkout...
+        uses: actions/checkout@v1
+        
+      - name: 2. setup nodejs...
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      
+      - name: 3. install hexo...
+        run: |
+          npm install hexo-cli -g
+          npm install pnpm -g
+          pnpm install
+          
+      - name: 4. hexo generate public files...
+        run: |
+          pnpm run clean
+          pnpm run build
+          cp ./CNAME ./public/CNAME
+          cp ./README.md ./public/README.md
+
+      - name: 5. deploy 'public files'
+        run: |
+          cd public
+          git init
+          git config user.name "willow"
+          git config user.email "18982811237@163.com"
+          git add .
+          git commit -am "Feat: Github Action Auto Update Blog"
+          git push --force --quiet "https://${{BLOG_TOKEN}}@github.com/willow237/blog.git" main:main
